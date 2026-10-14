@@ -11,6 +11,14 @@ import pytest
 
 from performance_engineering_lab.spec import Spec, default_spec_path, load_spec
 
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Create the git-ignored parent of --basetemp, missing on a fresh checkout."""
+    basetemp = config.option.basetemp
+    if basetemp:
+        Path(basetemp).parent.mkdir(parents=True, exist_ok=True)
+
+
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
