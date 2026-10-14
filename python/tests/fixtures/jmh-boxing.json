@@ -1,0 +1,274 @@
+[
+ {
+  "jmhVersion": "1.37",
+  "benchmark": "portfolio.performanceengineeringlab.bench.BoxingBench.run",
+  "mode": "avgt",
+  "threads": 1,
+  "forks": 1,
+  "jvm": "<jdk>/bin/java",
+  "jvmArgs": [
+   "-Xmx512m",
+   "-XX:-UsePerfData",
+   "-XX:ErrorFile=<repo>/.tmp/jmh/hs_err_pid%p.log",
+   "-XX:HeapDumpPath=<repo>/.tmp/jmh",
+   "-Djava.io.tmpdir=<repo>/.tmp/jmh"
+  ],
+  "jdkVersion": "21.0.12.1",
+  "vmName": "OpenJDK 64-Bit Server VM",
+  "vmVersion": "21.0.12.1+1-LTS",
+  "warmupIterations": 1,
+  "warmupTime": "100 ms",
+  "warmupBatchSize": 1,
+  "measurementIterations": 1,
+  "measurementTime": "100 ms",
+  "measurementBatchSize": 1,
+  "params": {
+   "size": "1048576",
+   "variant": "int-array"
+  },
+  "primaryMetric": {
+   "score": 122915.12415349887,
+   "scoreError": "NaN",
+   "scoreConfidence": [
+    "NaN",
+    "NaN"
+   ],
+   "scoreUnit": "ns/op",
+   "rawData": [
+    [
+     122915.12415349887
+    ]
+   ]
+  },
+  "secondaryMetrics": {
+   "gc.alloc.rate": {
+    "score": 0.060200359332041244,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     "NaN",
+     "NaN"
+    ],
+    "scoreUnit": "MB/sec",
+    "rawData": [
+     [
+      0.060200359332041244
+     ]
+    ]
+   },
+   "gc.alloc.rate.norm": {
+    "score": 7.792325056433409,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     "NaN",
+     "NaN"
+    ],
+    "scoreUnit": "B/op",
+    "rawData": [
+     [
+      7.792325056433409
+     ]
+    ]
+   },
+   "gc.count": {
+    "score": 0.0,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     0.0,
+     0.0
+    ],
+    "scoreUnit": "counts",
+    "rawData": [
+     [
+      0.0
+     ]
+    ]
+   }
+  }
+ },
+ {
+  "jmhVersion": "1.37",
+  "benchmark": "portfolio.performanceengineeringlab.bench.BoxingBench.run",
+  "mode": "avgt",
+  "threads": 1,
+  "forks": 1,
+  "jvm": "<jdk>/bin/java",
+  "jvmArgs": [
+   "-Xmx512m",
+   "-XX:-UsePerfData",
+   "-XX:ErrorFile=<repo>/.tmp/jmh/hs_err_pid%p.log",
+   "-XX:HeapDumpPath=<repo>/.tmp/jmh",
+   "-Djava.io.tmpdir=<repo>/.tmp/jmh"
+  ],
+  "jdkVersion": "21.0.12.1",
+  "vmName": "OpenJDK 64-Bit Server VM",
+  "vmVersion": "21.0.12.1+1-LTS",
+  "warmupIterations": 1,
+  "warmupTime": "100 ms",
+  "warmupBatchSize": 1,
+  "measurementIterations": 1,
+  "measurementTime": "100 ms",
+  "measurementBatchSize": 1,
+  "params": {
+   "size": "1048576",
+   "variant": "boxed-list"
+  },
+  "primaryMetric": {
+   "score": 2084485.4545454546,
+   "scoreError": "NaN",
+   "scoreConfidence": [
+    "NaN",
+    "NaN"
+   ],
+   "scoreUnit": "ns/op",
+   "rawData": [
+    [
+     2084485.4545454546
+    ]
+   ]
+  },
+  "secondaryMetrics": {
+   "gc.alloc.rate": {
+    "score": 0.05710258152321208,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     "NaN",
+     "NaN"
+    ],
+    "scoreUnit": "MB/sec",
+    "rawData": [
+     [
+      0.05710258152321208
+     ]
+    ]
+   },
+   "gc.alloc.rate.norm": {
+    "score": 125.52727272727273,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     "NaN",
+     "NaN"
+    ],
+    "scoreUnit": "B/op",
+    "rawData": [
+     [
+      125.52727272727273
+     ]
+    ]
+   },
+   "gc.count": {
+    "score": 0.0,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     0.0,
+     0.0
+    ],
+    "scoreUnit": "counts",
+    "rawData": [
+     [
+      0.0
+     ]
+    ]
+   }
+  }
+ },
+ {
+  "jmhVersion": "1.37",
+  "benchmark": "portfolio.performanceengineeringlab.bench.BoxingBench.run",
+  "mode": "avgt",
+  "threads": 1,
+  "forks": 1,
+  "jvm": "<jdk>/bin/java",
+  "jvmArgs": [
+   "-Xmx512m",
+   "-XX:-UsePerfData",
+   "-XX:ErrorFile=<repo>/.tmp/jmh/hs_err_pid%p.log",
+   "-XX:HeapDumpPath=<repo>/.tmp/jmh",
+   "-Djava.io.tmpdir=<repo>/.tmp/jmh"
+  ],
+  "jdkVersion": "21.0.12.1",
+  "vmName": "OpenJDK 64-Bit Server VM",
+  "vmVersion": "21.0.12.1+1-LTS",
+  "warmupIterations": 1,
+  "warmupTime": "100 ms",
+  "warmupBatchSize": 1,
+  "measurementIterations": 1,
+  "measurementTime": "100 ms",
+  "measurementBatchSize": 1,
+  "params": {
+   "size": "1048576",
+   "variant": "boxed-accumulator"
+  },
+  "primaryMetric": {
+   "score": 4413015.384615385,
+   "scoreError": "NaN",
+   "scoreConfidence": [
+    "NaN",
+    "NaN"
+   ],
+   "scoreUnit": "ns/op",
+   "rawData": [
+    [
+     4413015.384615385
+    ]
+   ]
+  },
+  "secondaryMetrics": {
+   "gc.alloc.rate": {
+    "score": 5420.681305151278,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     "NaN",
+     "NaN"
+    ],
+    "scoreUnit": "MB/sec",
+    "rawData": [
+     [
+      5420.681305151278
+     ]
+    ]
+   },
+   "gc.alloc.rate.norm": {
+    "score": 25166090.46153846,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     "NaN",
+     "NaN"
+    ],
+    "scoreUnit": "B/op",
+    "rawData": [
+     [
+      25166090.46153846
+     ]
+    ]
+   },
+   "gc.count": {
+    "score": 3.0,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     3.0,
+     3.0
+    ],
+    "scoreUnit": "counts",
+    "rawData": [
+     [
+      3.0
+     ]
+    ]
+   },
+   "gc.time": {
+    "score": 7.0,
+    "scoreError": "NaN",
+    "scoreConfidence": [
+     7.0,
+     7.0
+    ],
+    "scoreUnit": "ms",
+    "rawData": [
+     [
+      7.0
+     ]
+    ]
+   }
+  }
+ }
+]

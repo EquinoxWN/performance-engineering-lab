@@ -1,0 +1,34 @@
+.DS_Store
+.env
+.idea/
+.vscode/
+*.log
+target/
+*.class
+*.iml
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
+node_modules/
+coverage/
+
+# JVM crash files and heap dumps, should one ever land outside .tmp/
+hs_err_pid*
+*.hprof
+
+# Claude Code files (never committed)
+.claude/
+CLAUDE.local.md
+CLAUDE.md
+.mcp.json
+
+# Local tool caches, logs and experiment output (kept inside the repo)
+.tmp/
+.m2/
+.npm-cache/

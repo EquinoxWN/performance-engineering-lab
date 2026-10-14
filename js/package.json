@@ -1,0 +1,23 @@
+{
+  "name": "performance-engineering-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Why two functions with the same Big-O differ 10x in practice: cache lines, branch prediction and allocation, measured not guessed.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-timeout=120000 \"test/*.test.js\"",
+    "lint": "tsc -p tsconfig.json",
+    "bench": "node --max-old-space-size=512 src/bench.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "mitata": "1.0.34"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "name": "performance-engineering-lab",
+  "version": 1,
+  "data": {
+    "generator": "xorshift32",
+    "value_seed": 2463534242,
+    "permutation_seed": 88675123,
+    "value_bits": 20,
+    "byte_bits": 8
+  },
+  "checks": {
+    "xorshift32_seed1_first": [270369, 67634689, 2647435461],
+    "values_4096": {"sum": 2125438190, "first": [176628, 609708, 503941]},
+    "permutation_4096": {"weighted": 17280566766, "first": [3759, 586, 3010]},
+    "bytes_65536": {"sum_at_least_128": 6270565, "count_at_least_128": 32728}
+  },
+  "settings": {
+    "noise_threshold": 0.15,
+    "min_forks_for_verdict": 3
+  },
+  "profiles": {
+    "full": {
+      "java": {"forks": 3, "warmup_iterations": 3, "iterations": 5, "iteration_ms": 500},
+      "python": {"processes": 5, "values": 3, "warmups": 1, "min_time": 0.1},
+      "js": {"processes": 5, "min_cpu_ms": 642, "node_flags": []}
+    },
+    "smoke": {
+      "java": {"forks": 1, "warmup_iterations": 1, "iterations": 1, "iteration_ms": 100},
+      "python": {"processes": 1, "values": 1, "warmups": 1, "min_time": 0.01},
+      "js": {"processes": 1, "min_cpu_ms": 100, "node_flags": []}
+    },
+    "js-no-maglev": {
+      "java": {"forks": 3, "warmup_iterations": 3, "iterations": 5, "iteration_ms": 500},
+      "python": {"processes": 5, "values": 3, "warmups": 1, "min_time": 0.1},
+      "js": {"processes": 5, "min_cpu_ms": 642, "node_flags": ["--no-maglev"]}
+    }
+  },
+  "experiments": [
+    {
+      "id": "access-pattern",
+      "effect": "cache lines and hardware prefetching",
+      "kernel": "s += data[idx[i]] for i in 0..n-1; idx is the identity or a random permutation, so both variants add the same n values",
+      "runtimes": {
+        "java": {"sizes": [4096, 16777216], "variants": ["sequential", "shuffled"]},
+        "js": {"sizes": [4096, 16777216], "variants": ["sequential", "shuffled"]},
+        "python": {"sizes": [4096, 2097152], "variants": ["sequential", "shuffled"]}
+      }
+    },
+    {
+      "id": "branch",
+      "effect": "branch prediction",
+      "kernel": "sum of the values >= 128 among n bytes, written with an if (branchy) or with a bit mask (branchless), over the same bytes sorted or in random order",
+      "runtimes": {
+        "java": {"sizes": [65536], "variants": ["branchy-sorted", "branchy-shuffled", "branchless-sorted", "branchless-shuffled"]},
+        "js": {"sizes": [65536], "variants": ["branchy-sorted", "branchy-shuffled", "branchless-sorted", "branchless-shuffled"]},
+        "python": {"sizes": [65536], "variants": ["branchy-sorted", "branchy-shuffled", "branchless-sorted", "branchless-shuffled"]}
+      }
+    },
+    {
+      "id": "boxing",
+      "effect": "allocation, boxing and pointer chasing",
+      "kernel": "sum of n 20-bit values held in a primitive array, a container of boxed numbers, or objects with one field",
+      "runtimes": {
+        "java": {"sizes": [1048576], "variants": ["int-array", "boxed-list", "boxed-accumulator"]},
+        "js": {"sizes": [1048576], "variants": ["int32array", "smi-array", "object-array"]},
+        "python": {"sizes": [1048576], "variants": ["list", "array", "objects"]}
+      }
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H01", "runtime": "java", "experiment": "access-pattern", "size": 16777216,
+      "statement": "With 64 MB of data (more than the 24 MB L3 cache), gathering through a random permutation is at least 4x slower per element than through the identity.",
+      "why": "Sequential indices touch each 64-byte cache line 16 times and the prefetcher streams it in; random indices miss L3 on almost every load and pay a DRAM round trip.",
+      "kind": "ratio", "numerator": "shuffled", "denominator": "sequential", "op": ">=", "value": 4.0
+    },
+    {
+      "id": "H02", "runtime": "java", "experiment": "access-pattern", "size": 4096,
+      "statement": "With 16 KB of data (fits in the 48 KB L1 data cache), the random permutation costs at most 1.5x the identity.",
+      "why": "When every line is already in L1 the access order no longer matters much.",
+      "kind": "ratio", "numerator": "shuffled", "denominator": "sequential", "op": "<=", "value": 1.5
+    },
+    {
+      "id": "H03", "runtime": "js", "experiment": "access-pattern", "size": 16777216,
+      "statement": "In V8 with Int32Array and 64 MB of data, the random permutation is at least 4x slower per element than the identity.",
+      "why": "TurboFan compiles the typed-array gather to plain loads, so the hardware effect should match Java's.",
+      "kind": "ratio", "numerator": "shuffled", "denominator": "sequential", "op": ">=", "value": 4.0
+    },
+    {
+      "id": "H04", "runtime": "js", "experiment": "access-pattern", "size": 4096,
+      "statement": "In V8 with 16 KB of data, the random permutation costs at most 1.5x the identity.",
+      "why": "Same reasoning as H02.",
+      "kind": "ratio", "numerator": "shuffled", "denominator": "sequential", "op": "<=", "value": 1.5
+    },
+    {
+      "id": "H05", "runtime": "python", "experiment": "access-pattern", "size": 2097152,
+      "statement": "In CPython with 2M list elements (about 80 MB of pointers and int objects), the random permutation is at least 1.5x slower per element than the identity.",
+      "why": "Each element is a pointer to a separate int object, so a random order misses cache twice per element; the interpreter's own cost per element (tens of ns) dilutes the ratio.",
+      "kind": "ratio", "numerator": "shuffled", "denominator": "sequential", "op": ">=", "value": 1.5
+    },
+    {
+      "id": "H06", "runtime": "python", "experiment": "access-pattern", "size": 4096,
+      "statement": "In CPython with 4096 list elements, the random permutation costs at most 1.2x the identity.",
+      "why": "All objects fit in L2, and interpreter overhead dominates.",
+      "kind": "ratio", "numerator": "shuffled", "denominator": "sequential", "op": "<=", "value": 1.2
+    },
+    {
+      "id": "H07", "runtime": "java", "experiment": "branch", "size": 65536,
+      "statement": "The branchy kernel is at least 3x slower on bytes in random order than on the same bytes sorted.",
+      "why": "Random bytes make the >= 128 branch a coin flip, so the predictor misses about half the time (about 15 to 20 cycles each); sorted bytes switch the outcome once.",
+      "kind": "ratio", "numerator": "branchy-shuffled", "denominator": "branchy-sorted", "op": ">=", "value": 3.0
+    },
+    {
+      "id": "H08", "runtime": "java", "experiment": "branch", "size": 65536,
+      "statement": "The branchless (bit mask) kernel costs at most 1.2x more on random bytes than on sorted bytes.",
+      "why": "Without a data-dependent branch there is nothing to mispredict.",
+      "kind": "ratio", "numerator": "branchless-shuffled", "denominator": "branchless-sorted", "op": "<=", "value": 1.2
+    },
+    {
+      "id": "H09", "runtime": "js", "experiment": "branch", "size": 65536,
+      "statement": "In V8 the branchy kernel is at least 3x slower on random bytes than on sorted bytes.",
+      "why": "Same reasoning as H07.",
+      "kind": "ratio", "numerator": "branchy-shuffled", "denominator": "branchy-sorted", "op": ">=", "value": 3.0
+    },
+    {
+      "id": "H10", "runtime": "js", "experiment": "branch", "size": 65536,
+      "statement": "In V8 the branchless kernel costs at most 1.2x more on random bytes than on sorted bytes.",
+      "why": "Same reasoning as H08.",
+      "kind": "ratio", "numerator": "branchless-shuffled", "denominator": "branchless-sorted", "op": "<=", "value": 1.2
+    },
+    {
+      "id": "H11", "runtime": "python", "experiment": "branch", "size": 65536,
+      "statement": "In CPython the branchy kernel is at least 1.2x slower on random bytes than on sorted bytes.",
+      "why": "The interpreter's conditional jump follows the data, so it is mispredicted on random bytes, but each element also costs tens of ns of interpreter work.",
+      "kind": "ratio", "numerator": "branchy-shuffled", "denominator": "branchy-sorted", "op": ">=", "value": 1.2
+    },
+    {
+      "id": "H12", "runtime": "python", "experiment": "branch", "size": 65536,
+      "statement": "In CPython the branchless kernel costs at most 1.1x more on random bytes than on sorted bytes.",
+      "why": "Same reasoning as H08.",
+      "kind": "ratio", "numerator": "branchless-shuffled", "denominator": "branchless-sorted", "op": "<=", "value": 1.1
+    },
+    {
+      "id": "H13", "runtime": "java", "experiment": "boxing", "size": 1048576,
+      "statement": "Summing an ArrayList<Integer> is at least 3x slower than summing an int[] with the same values.",
+      "why": "The list holds 4-byte references to 16-byte Integer objects, so every element costs an extra dependent load, and the int[] loop can be vectorized.",
+      "kind": "ratio", "numerator": "boxed-list", "denominator": "int-array", "op": ">=", "value": 3.0
+    },
+    {
+      "id": "H14", "runtime": "java", "experiment": "boxing", "size": 1048576,
+      "statement": "A boxed Long accumulator (Long sum += v) allocates at least 16 bytes per element.",
+      "why": "Each += creates a new Long through Long.valueOf, and the value cache only covers -128 to 127.",
+      "kind": "absolute", "variant": "boxed-accumulator", "metric": "alloc_bytes_per_element", "op": ">=", "value": 16.0
+    },
+    {
+      "id": "H15", "runtime": "java", "experiment": "boxing", "size": 1048576,
+      "statement": "The boxed Long accumulator is at least 2x slower than a primitive long accumulator over the same int[].",
+      "why": "One allocation per element plus the young-generation collections it causes.",
+      "kind": "ratio", "numerator": "boxed-accumulator", "denominator": "int-array", "op": ">=", "value": 2.0
+    },
+    {
+      "id": "H16", "runtime": "js", "experiment": "boxing", "size": 1048576,
+      "statement": "In V8, summing an array of {v} objects is at least 2x slower than summing an Int32Array with the same values.",
+      "why": "Every element is a pointer to a heap object whose field must be loaded, instead of a contiguous 4-byte integer.",
+      "kind": "ratio", "numerator": "object-array", "denominator": "int32array", "op": ">=", "value": 2.0
+    },
+    {
+      "id": "H17", "runtime": "js", "experiment": "boxing", "size": 1048576,
+      "statement": "In V8, a plain Array of small integers (PACKED_SMI_ELEMENTS) costs at most 1.5x an Int32Array.",
+      "why": "Small integers are stored unboxed (tagged) inside the array, so there is no pointer chasing, only tag checks and wider elements.",
+      "kind": "ratio", "numerator": "smi-array", "denominator": "int32array", "op": "<=", "value": 1.5
+    },
+    {
+      "id": "H18", "runtime": "python", "experiment": "boxing", "size": 1048576,
+      "statement": "In CPython, summing an array('q') is no slower than summing a list of the same ints (textbook view: unboxed storage is faster).",
+      "why": "array('q') stores 8-byte machine integers contiguously, while a list stores pointers to separate int objects.",
+      "kind": "ratio", "numerator": "array", "denominator": "list", "op": "<=", "value": 1.0
+    },
+    {
+      "id": "H19", "runtime": "python", "experiment": "boxing", "size": 1048576,
+      "statement": "In CPython, summing one attribute of objects with __slots__ is at least 1.5x slower than summing a list of ints.",
+      "why": "Each element adds an attribute lookup through the type's slot descriptor and one more dependent load.",
+      "kind": "ratio", "numerator": "objects", "denominator": "list", "op": ">=", "value": 1.5
+    }
+  ]
+}
