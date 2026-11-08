@@ -62,3 +62,20 @@ def test_a_range_touching_the_threshold_is_inconclusive_not_refuted() -> None:
     num, den = summarize([2.5, 2.75, 3.0]), summarize([1.0, 1.0, 1.0])
     assert judge_ratio(">=", 3.0, num, den, 3).status == "inconclusive"
     assert judge_ratio("<=", 2.5, num, den, 3).status == "inconclusive"
+
+
+def test_a_range_starting_exactly_at_the_threshold_is_confirmed() -> None:
+    num, den = summarize([3.0, 3.5, 4.0]), summarize([1.0, 1.0, 1.0])
+    assert judge_ratio(">=", 3.0, num, den, 3).status == "confirmed"
+    assert judge_absolute(">=", 3.0, num, 3).status == "confirmed"
+
+
+def test_too_few_forks_on_either_side_of_a_ratio_are_not_judged() -> None:
+    many, few = summarize([4.0, 4.1, 4.2]), summarize([1.0, 1.1])
+    assert judge_ratio(">=", 2.0, many, few, 3).status == "not judged"
+    assert judge_ratio(">=", 2.0, few, many, 3).status == "not judged"
+
+
+def test_negative_timings_are_refused() -> None:
+    with pytest.raises(ValueError, match="non-negative"):
+        summarize([1.0, -0.5])

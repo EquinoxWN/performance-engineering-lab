@@ -41,6 +41,8 @@ test("bad sizes and widths are rejected", () => {
   assert.throws(() => values(-1, 1, 20), RangeError);
   assert.throws(() => values(MAX_SIZE + 1, 1, 20), RangeError);
   assert.throws(() => values(10, 1, 0), RangeError);
+  assert.throws(() => values(10, 1, 32), RangeError);
+  assert.equal(values(1, 1, 31).length, 1);
   assert.throws(() => identity(1.5), RangeError);
 });
 

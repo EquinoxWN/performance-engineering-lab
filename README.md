@@ -21,7 +21,7 @@ TurboFan speed. The same kernels with `--no-maglev` confirmed all six JavaScript
 
 ![Node.js results with default tiering and with TurboFan only](docs/proof/v8-tiering.jpg)
 
-Lint, 107 tests in three languages and a clean dependency audit:
+Lint, 110 tests in three languages (107 when this screenshot was taken) and a clean dependency audit:
 
 ![Lint, Java, Python and JavaScript tests and the audit](docs/proof/tests.jpg)
 
@@ -89,7 +89,7 @@ the runner and report, see its [README](python/README.md)) and [`js/`](js).
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 make setup                # Python package and dev tools, npm packages
 make lint                 # Spotless + javac -Xlint:all -Werror, ruff + mypy --strict, tsc --checkJs --strict
-make test                 # 107 tests: Java 16, Python 82, JavaScript 9
+make test                 # 110 tests: Java 16, Python 85, JavaScript 9
 make bench CPUS=2-7       # every experiment, full profile (about 9 minutes); CPUS optional
 make bench-smoke          # 1 fork per cell: proves the pipeline, judges nothing (CI)
 make audit                # pip-audit, npm audit, OSV.dev for Maven
@@ -108,7 +108,8 @@ Full numbers, commands and analysis: [docs/results/m1.md](docs/results/m1.md).
 
 | Check | Result |
 |---|---|
-| Tests (`make test`) | **107 passed** (Java 16, Python 82, JavaScript 9), 0 failed; full check run twice |
+| Tests (`make test`) | **110 passed** (Java 16, Python 85, JavaScript 9), 0 failed |
+| Quality check | 10 rules and 15 mutants, all killed: [docs/quality/2026-11-01.md](docs/quality/2026-11-01.md) |
 | Lint (`make lint`) | clean: Spotless, javac `-Xlint:all -Werror`, ruff, ruff format, mypy `--strict`, tsc `--checkJs --strict` |
 | Benchmarks (`make bench CPUS=2-7`) | `RESULT hypotheses=19 confirmed=15 refuted=4 inconclusive=0 not_judged=0 noisy_cells=8/33 complete=yes` |
 | Follow-up, Node.js `--no-maglev` | `RESULT hypotheses=6 confirmed=6 refuted=0 ...` |
@@ -135,7 +136,7 @@ Full numbers, commands and analysis: [docs/results/m1.md](docs/results/m1.md).
 | `bench.test.js` | 4 | every JS cell computes its expected result; one valid mitata line per process; bad arguments exit 2 |
 | `test_spec.py` | 23 | every cell has a hypothesis; 19 kinds of inconsistent spec refused; oversized files refused |
 | `test_results.py` | 20 | real JMH, pyperf and mitata outputs parsed into per-fork samples; 13 malformed inputs refused; paths scrubbed |
-| `test_stats.py` | 6 | intervals and the confirmed / refuted / inconclusive rule, including the boundary |
+| `test_stats.py` | 9 | intervals and the confirmed / refuted / inconclusive rule, including both boundaries; too few forks on either side; negative timings refused |
 | `test_report.py` | 6 | complete results judged; missing or unexpected cells exit 3; noisy cells marked |
 | `test_run.py` | 9 | harness commands are spec-driven, heap-capped and contained in `.tmp/`; one real pyperf run |
 
