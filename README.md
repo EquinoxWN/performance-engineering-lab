@@ -21,7 +21,7 @@ TurboFan speed. The same kernels with `--no-maglev` confirmed all six JavaScript
 
 ![Node.js results with default tiering and with TurboFan only](docs/proof/v8-tiering.jpg)
 
-Lint, 110 tests in three languages (107 when this screenshot was taken) and a clean dependency audit:
+Lint, 111 tests in three languages (107 when this screenshot was taken) and a clean dependency audit:
 
 ![Lint, Java, Python and JavaScript tests and the audit](docs/proof/tests.jpg)
 
