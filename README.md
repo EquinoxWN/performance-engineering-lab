@@ -89,7 +89,7 @@ the runner and report, see its [README](python/README.md)) and [`js/`](js).
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 make setup                # Python package and dev tools, npm packages
 make lint                 # Spotless + javac -Xlint:all -Werror, ruff + mypy --strict, tsc --checkJs --strict
-make test                 # 110 tests: Java 16, Python 85, JavaScript 9
+make test                 # 111 tests: Java 16, Python 86, JavaScript 9
 make bench CPUS=2-7       # every experiment, full profile (about 9 minutes); CPUS optional
 make bench-smoke          # 1 fork per cell: proves the pipeline, judges nothing (CI)
 make audit                # pip-audit, npm audit, OSV.dev for Maven
@@ -108,7 +108,7 @@ Full numbers, commands and analysis: [docs/results/m1.md](docs/results/m1.md).
 
 | Check | Result |
 |---|---|
-| Tests (`make test`) | **110 passed** (Java 16, Python 85, JavaScript 9), 0 failed |
+| Tests (`make test`) | **111 passed** (Java 16, Python 86, JavaScript 9), 0 failed |
 | Quality check | 10 rules and 15 mutants, all killed: [docs/quality/2026-11-01.md](docs/quality/2026-11-01.md) |
 | Lint (`make lint`) | clean: Spotless, javac `-Xlint:all -Werror`, ruff, ruff format, mypy `--strict`, tsc `--checkJs --strict` |
 | Benchmarks (`make bench CPUS=2-7`) | `RESULT hypotheses=19 confirmed=15 refuted=4 inconclusive=0 not_judged=0 noisy_cells=8/33 complete=yes` |

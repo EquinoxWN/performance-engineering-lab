@@ -43,6 +43,12 @@ def test_ratio_verdicts_use_the_worst_case_range_across_forks() -> None:
     assert judge_ratio("<=", 4.5, slow, fast, 3).status == "inconclusive"
 
 
+def test_a_zero_timing_in_the_denominator_is_not_judged() -> None:
+    v = judge_ratio(">=", 3.0, summarize([40.0, 42.0, 44.0]), summarize([0.0, 10.0, 11.0]), 3)
+    assert v.status == "not judged"
+    assert v.reason == "a denominator fork measured 0 ns"
+
+
 def test_too_few_forks_are_not_judged() -> None:
     a, b = summarize([4.0, 4.1]), summarize([1.0, 1.1, 1.2])
     assert judge_ratio(">=", 2.0, a, b, 3).status == "not judged"

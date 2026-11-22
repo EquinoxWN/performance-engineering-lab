@@ -87,6 +87,8 @@ def _decide(op: str, threshold: float, low: float, high: float) -> Status:
 
 def judge_ratio(op: str, threshold: float, num: Summary, den: Summary, min_forks: int) -> Verdict:
     """Ratio of medians, with the range min(num)/max(den) .. max(num)/min(den) across forks."""
+    if den.minimum == 0:
+        return Verdict("not judged", math.nan, math.nan, math.nan, "a denominator fork measured 0 ns")
     measured = num.median / den.median
     low, high = num.minimum / den.maximum, num.maximum / den.minimum
     if min(num.n, den.n) < min_forks:
